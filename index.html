@@ -2,12 +2,34 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Dropmap Lethal Norte</title>
+  <title>Dropmap Spot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fuente gaming estilo Fortnite (Rajdhani) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Segoe UI,Arial,sans-serif;}
+    :root{
+      /* Paleta inspirada en Fortnite */
+      --fn-blue:#1B90DD;
+      --fn-sky:#5FCEEA;
+      --fn-purple:#3d02bd;
+      --fn-pink:#e25bff;
+      --fn-gold:#facc15;
+      --fn-bg:#020617;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:"Rajdhani",system-ui,Segoe UI,Arial,sans-serif;
+    }
+
     body{
-      background:radial-gradient(circle at top,#0f172a,#020617 60%);
+      background:radial-gradient(circle at top,#1B90DD,#050816 55%,#020617 100%);
       color:#e5e7eb;
       min-height:100vh;
       display:flex;
@@ -15,30 +37,36 @@
       justify-content:center;
       padding:10px;
     }
+
     /* LOGIN */
     #login{
-      background:rgba(15,23,42,.95);
+      background:rgba(5,10,30,.96);
       border-radius:18px;
-      padding:18px 20px;
+      padding:20px 22px 18px;
       width:100%;
       max-width:380px;
-      border:1px solid rgba(148,163,184,.6);
-      box-shadow:0 20px 60px rgba(0,0,0,.9);
+      border:1px solid rgba(148,163,184,.7);
+      box-shadow:
+        0 0 25px rgba(27,144,221,.6),
+        0 20px 50px rgba(0,0,0,.9);
     }
     #login h1{
-      font-size:20px;
-      letter-spacing:.12em;
+      font-size:22px;
+      letter-spacing:.18em;
       text-transform:uppercase;
-      color:#38bdf8;
-      margin-bottom:8px;
+      color:#fff;
       text-align:center;
+      text-shadow:0 0 12px rgba(0,0,0,.9);
     }
+    #login h1 span:nth-child(1){color:#fff;}
+    #login h1 span:nth-child(2){color:var(--fn-sky);}
+    #login h1 span:nth-child(3){color:var(--fn-pink);}
     #login small{
       display:block;
       font-size:11px;
       color:#9ca3af;
       text-align:center;
-      margin-bottom:12px;
+      margin:6px 0 12px;
     }
     label{
       font-size:12px;
@@ -49,24 +77,46 @@
     }
     input{
       width:100%;
-      padding:6px 8px;
+      padding:7px 9px;
       border-radius:8px;
-      border:1px solid rgba(148,163,184,.7);
+      border:1px solid rgba(148,163,184,.9);
       background:#020617;
       color:#e5e7eb;
       font-size:13px;
+      outline:none;
+      transition:border-color .1s ease, box-shadow .1s ease;
+    }
+    input:focus{
+      border-color:var(--fn-sky);
+      box-shadow:0 0 0 1px rgba(95,206,234,.6);
     }
     #login button{
-      margin-top:12px;
+      margin-top:14px;
       width:100%;
-      padding:7px 10px;
+      padding:8px 10px;
       border-radius:999px;
       border:none;
-      background:linear-gradient(90deg,#22c55e,#38bdf8);
-      color:#020617;
-      font-weight:600;
+      background:linear-gradient(135deg,var(--fn-pink),var(--fn-purple));
+      color:#ffffff;
+      font-weight:700;
       font-size:13px;
       cursor:pointer;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      box-shadow:
+        0 0 18px rgba(226,91,255,.85),
+        0 16px 32px rgba(0,0,0,.85);
+      transition:transform .08s ease, box-shadow .08s ease, filter .08s ease;
+    }
+    #login button:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.05);
+    }
+    #login button:active{
+      transform:translateY(1px) scale(.98);
+      box-shadow:
+        0 0 10px rgba(226,91,255,.7),
+        0 10px 20px rgba(0,0,0,.7);
     }
     #login-error{
       margin-top:6px;
@@ -84,21 +134,33 @@
       width:100%;
       max-width:1200px;
       margin:auto;
+      background:linear-gradient(145deg,rgba(5,10,30,.97),rgba(11,16,32,.98));
+      border-radius:18px;
+      padding:14px 16px 16px;
+      border:1px solid rgba(148,163,184,.7);
+      box-shadow:
+        0 0 26px rgba(27,144,221,.55),
+        0 30px 60px rgba(0,0,0,.9);
     }
     #app-header{
       text-align:center;
       margin-bottom:6px;
     }
     #app-header h2{
-      font-size:20px;
-      letter-spacing:.12em;
+      font-size:22px;
+      letter-spacing:.18em;
       text-transform:uppercase;
-      color:#38bdf8;
+      color:#ffffff;
+      text-shadow:0 0 14px rgba(0,0,0,.9);
     }
+    #app-header h2 span:nth-child(1){color:#fff;}
+    #app-header h2 span:nth-child(2){color:var(--fn-sky);}
+    #app-header h2 span:nth-child(3){color:var(--fn-pink);}
     #app-header small{
       font-size:11px;
       color:#9ca3af;
     }
+
     .grid{
       width:100%;
       display:grid;
@@ -106,25 +168,27 @@
       gap:12px;
       margin-top:10px;
     }
+
     .card{
-      background:rgba(15,23,42,.98);
-      border-radius:12px;
-      border:1px solid rgba(148,163,184,.5);
+      background:radial-gradient(circle at top,rgba(61,2,189,.4),rgba(15,23,42,.98));
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.7);
       padding:8px;
-      box-shadow:0 12px 30px rgba(15,23,42,.9);
+      box-shadow:0 14px 32px rgba(0,0,0,.9);
       cursor:pointer;
-      transition:transform .1s ease, box-shadow .1s ease, border-color .1s ease;
+      transition:transform .08s ease, box-shadow .08s ease, border-color .08s ease, filter .08s ease;
     }
     .card:hover{
       transform:translateY(-2px);
-      box-shadow:0 16px 40px rgba(15,23,42,.9);
-      border-color:#38bdf8;
+      box-shadow:0 18px 40px rgba(0,0,0,1);
+      border-color:var(--fn-sky);
+      filter:brightness(1.03);
     }
     .title{
       font-size:12px;
       text-transform:uppercase;
-      letter-spacing:.1em;
-      color:#94a3b8;
+      letter-spacing:.12em;
+      color:#cbd5f5;
       margin-bottom:4px;
     }
     .map-wrap{
@@ -140,7 +204,7 @@
       height:100%;
       object-fit:cover;
       display:block;
-      filter:contrast(1.05) saturate(1.05) brightness(1.02);
+      filter:contrast(1.08) saturate(1.08) brightness(1.04);
     }
     .line{
       position:absolute;
@@ -155,20 +219,21 @@
       border-radius:50%;
       transform:translate(-50%,-50%);
       border:2px solid #020617;
-      box-shadow:0 0 10px rgba(0,0,0,.9);
+      box-shadow:0 0 12px rgba(0,0,0,.95);
     }
-    .start,.end{background:#3b82f6;}
+    .start{background:#3b82f6;}
+    .end{background:#6366f1;}
     .drop{background:#22c55e;}
-    .jump{background:#facc15;}
+    .jump{background:var(--fn-gold);}
     .label{
       position:absolute;
       top:-18px;
       left:50%;
       transform:translateX(-50%);
-      background:rgba(15,23,42,.95);
+      background:rgba(15,23,42,.96);
       padding:2px 6px;
       border-radius:999px;
-      border:1px solid rgba(148,163,184,.7);
+      border:1px solid rgba(148,163,184,.8);
       font-size:10px;
       white-space:nowrap;
     }
@@ -182,7 +247,7 @@
     #modal{
       position:fixed;
       inset:0;
-      background:rgba(15,23,42,.85);
+      background:rgba(5,10,30,.86);
       display:none;
       align-items:center;
       justify-content:center;
@@ -190,12 +255,14 @@
     }
     #modal-inner{
       background:#020617;
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,.6);
-      padding:10px;
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.8);
+      padding:10px 11px;
       max-width:95vw;
       max-height:95vh;
-      box-shadow:0 20px 60px rgba(0,0,0,.9);
+      box-shadow:
+        0 0 26px rgba(27,144,221,.7),
+        0 30px 60px rgba(0,0,0,1);
     }
     #modal-map{
       position:relative;
@@ -211,13 +278,13 @@
       height:100%;
       object-fit:cover;
       display:block;
-      filter:contrast(1.05) saturate(1.05) brightness(1.02);
+      filter:contrast(1.08) saturate(1.08) brightness(1.03);
     }
     #modal-title{
       font-size:14px;
       text-transform:uppercase;
-      letter-spacing:.12em;
-      color:#94a3b8;
+      letter-spacing:.14em;
+      color:#e5e7eb;
       margin-bottom:6px;
     }
     #modal-desc{
@@ -226,15 +293,20 @@
       color:#e5e7eb;
     }
     #modal-close{
-      margin-top:6px;
+      margin-top:7px;
       display:inline-block;
-      padding:4px 10px;
+      padding:4px 12px;
       border-radius:999px;
-      border:1px solid rgba(148,163,184,.7);
+      border:1px solid rgba(148,163,184,.8);
       font-size:11px;
       cursor:pointer;
       background:#020617;
       color:#e5e7eb;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+    #modal-close:hover{
+      border-color:var(--fn-sky);
     }
   </style>
 </head>
@@ -242,7 +314,7 @@
 
   <!-- LOGIN -->
   <div id="login">
-    <h1>DROPMAP PRIVADO</h1>
+    <h1><span>DROP</span><span>MAP</span><span> SPOT</span></h1>
     <small>Usuario: drop · Contraseña: victor</small>
     <label for="user">Usuario</label>
     <input id="user" autocomplete="off">
@@ -255,7 +327,7 @@
   <!-- APP -->
   <div id="app">
     <div id="app-header">
-      <h2>DROPMAP LETHAL NORTE</h2>
+      <h2><span>DROPMAP</span> <span>SPOT</span></h2>
       <small>Drop verde fijo (x:17, y:12). Marca amarilla sobre la línea del bus, algo antes de pasar por el drop.</small>
     </div>
     <div class="grid" id="cards"></div>
@@ -347,8 +419,8 @@
   const modalClose= document.getElementById("modal-close");
 
   function styleBusLine(lineEl){
-    lineEl.style.borderTop = "4px dashed rgba(96,165,250,1)";
-    lineEl.style.boxShadow = "0 0 6px rgba(15,23,42,0.9)";
+    lineEl.style.borderTop = "4px dashed " + "rgba(95,206,234,1)";
+    lineEl.style.boxShadow = "0 0 10px rgba(15,23,42,0.95)";
   }
 
   function computeJumpOnBus(rect, preset){
