@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dropmap Lethal Norte</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Segoe UI,Arial,sans-serif;}
+    body{
+      background:radial-gradient(circle at top,#0f172a,#020617 60%);
+      color:#e5e7eb;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+    }
+    /* LOGIN */
+    #login{
+      background:rgba(15,23,42,.95);
+      border-radius:18px;
+      padding:18px 20px;
+      width:100%;
+      max-width:380px;
+      border:1px solid rgba(148,163,184,.6);
+      box-shadow:0 20px 60px rgba(0,0,0,.9);
+    }
+    #login h1{
+      font-size:20px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#38bdf8;
+      margin-bottom:8px;
+      text-align:center;
+    }
+    #login small{
+      display:block;
+      font-size:11px;
+      color:#9ca3af;
+      text-align:center;
+      margin-bottom:12px;
+    }
+    label{
+      font-size:12px;
+      color:#cbd5e1;
+      display:block;
+      margin-top:8px;
+      margin-bottom:4px;
+    }
+    input{
+      width:100%;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,.7);
+      background:#020617;
+      color:#e5e7eb;
+      font-size:13px;
+    }
+    #login button{
+      margin-top:12px;
+      width:100%;
+      padding:7px 10px;
+      border-radius:999px;
+      border:none;
+      background:linear-gradient(90deg,#22c55e,#38bdf8);
+      color:#020617;
+      font-weight:600;
+      font-size:13px;
+      cursor:pointer;
+    }
+    #login-error{
+      margin-top:6px;
+      font-size:11px;
+      color:#f97373;
+      min-height:14px;
+      text-align:center;
+    }
+
+    /* APP */
+    #app{
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      width:100%;
+      max-width:1200px;
+      margin:auto;
+    }
+    #app-header{
+      text-align:center;
+      margin-bottom:6px;
+    }
+    #app-header h2{
+      font-size:20px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#38bdf8;
+    }
+    #app-header small{
+      font-size:11px;
+      color:#9ca3af;
+    }
+    .grid{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+    .card{
+      background:rgba(15,23,42,.98);
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,.5);
+      padding:8px;
+      box-shadow:0 12px 30px rgba(15,23,42,.9);
+      cursor:pointer;
+      transition:transform .1s ease, box-shadow .1s ease, border-color .1s ease;
+    }
+    .card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 16px 40px rgba(15,23,42,.9);
+      border-color:#38bdf8;
+    }
+    .title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      color:#94a3b8;
+      margin-bottom:4px;
+    }
+    .map-wrap{
+      position:relative;
+      width:100%;
+      aspect-ratio:1/1;
+      border-radius:10px;
+      overflow:hidden;
+      background:#000;
+    }
+    .map-img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter:contrast(1.05) saturate(1.05) brightness(1.02);
+    }
+    .line{
+      position:absolute;
+      height:0;
+      transform-origin:0 0;
+      pointer-events:none;
+    }
+    .pin{
+      position:absolute;
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      transform:translate(-50%,-50%);
+      border:2px solid #020617;
+      box-shadow:0 0 10px rgba(0,0,0,.9);
+    }
+    .start,.end{background:#3b82f6;}
+    .drop{background:#22c55e;}
+    .jump{background:#facc15;}
+    .label{
+      position:absolute;
+      top:-18px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(15,23,42,.95);
+      padding:2px 6px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      font-size:10px;
+      white-space:nowrap;
+    }
+    p{
+      font-size:11px;
+      margin-top:4px;
+      color:#cbd5f5;
+    }
+
+    /* MODAL */
+    #modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.85);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+    }
+    #modal-inner{
+      background:#020617;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.6);
+      padding:10px;
+      max-width:95vw;
+      max-height:95vh;
+      box-shadow:0 20px 60px rgba(0,0,0,.9);
+    }
+    #modal-map{
+      position:relative;
+      width:80vw;
+      max-width:900px;
+      aspect-ratio:1/1;
+      border-radius:12px;
+      overflow:hidden;
+      background:#000;
+    }
+    #modal-map img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter:contrast(1.05) saturate(1.05) brightness(1.02);
+    }
+    #modal-title{
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#94a3b8;
+      margin-bottom:6px;
+    }
+    #modal-desc{
+      font-size:12px;
+      margin-top:6px;
+      color:#e5e7eb;
+    }
+    #modal-close{
+      margin-top:6px;
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      font-size:11px;
+      cursor:pointer;
+      background:#020617;
+      color:#e5e7eb;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="login">
+    <h1>DROPMAP PRIVADO</h1>
+    <small>Usuario: drop · Contraseña: victor</small>
+    <label for="user">Usuario</label>
+    <input id="user" autocomplete="off">
+    <label for="pass">Contraseña</label>
+    <input id="pass" type="password">
+    <button id="login-btn">Entrar</button>
+    <div id="login-error"></div>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+    <div id="app-header">
+      <h2>DROPMAP LETHAL NORTE</h2>
+      <small>Drop verde fijo (x:17, y:12). Marca amarilla sobre la línea del bus, algo antes de pasar por el drop.</small>
+    </div>
+    <div class="grid" id="cards"></div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal">
+    <div id="modal-inner">
+      <div id="modal-title"></div>
+      <div id="modal-map">
+        <img src="mapa-fortnite.jpg" alt="Mapa Fortnite">
+        <div id="modal-line" class="line"></div>
+        <div id="modal-start" class="pin start"><span class="label">Inicio</span></div>
+        <div id="modal-end"   class="pin end"><span class="label">Fin</span></div>
+        <div id="modal-drop"  class="pin drop"><span class="label">Drop</span></div>
+        <div id="modal-jump"  class="pin jump"><span class="label">Salto aprox.</span></div>
+      </div>
+      <div id="modal-desc"></div>
+      <button id="modal-close">Cerrar</button>
+    </div>
+  </div>
+
+<script>
+  // ----- LOGIN -----
+  const loginBox   = document.getElementById("login");
+  const app        = document.getElementById("app");
+  const userInput  = document.getElementById("user");
+  const passInput  = document.getElementById("pass");
+  const loginBtn   = document.getElementById("login-btn");
+  const loginError = document.getElementById("login-error");
+
+  loginBtn.addEventListener("click",()=>{
+    const u = userInput.value.trim();
+    const p = passInput.value.trim();
+    if(u === "drop" && p === "victor"){
+      loginBox.style.display = "none";
+      app.style.display = "flex";
+    }else{
+      loginError.textContent = "Usuario o contraseña incorrectos.";
+    }
+  });
+  passInput.addEventListener("keydown",e=>{
+    if(e.key === "Enter") loginBtn.click();
+  });
+
+  // ----- DROPMAP -----
+  const dropPos = {x:17, y:12}; // tu drop
+
+  const presets = [
+    { name:"NE → SW ALTA 1", desc:"Bus muy alto por la derecha.",
+      start:{x:95,y:5}, end:{x:5,y:75} },
+    { name:"NE → SW MEDIA 1", desc:"Derecha alta a centro-sur izquierda.",
+      start:{x:90,y:20}, end:{x:10,y:95} },
+    { name:"NE → SW BAJA 1", desc:"Derecha media a esquina sur-oeste.",
+      start:{x:85,y:35}, end:{x:15,y:98} },
+
+    { name:"NW → SE ALTA 1", desc:"Bus muy alto por la izquierda.",
+      start:{x:5,y:5}, end:{x:95,y:75} },
+    { name:"NW → SE MEDIA 1", desc:"Izquierda alta a centro-sur derecha.",
+      start:{x:10,y:20}, end:{x:90,y:95} },
+    { name:"NW → SE BAJA 1", desc:"Izquierda media a esquina sur-este.",
+      start:{x:15,y:35}, end:{x:85,y:98} },
+
+    { name:"NORTE → SUR CENTRO", desc:"Vertical casi centrada.",
+      start:{x:50,y:2}, end:{x:50,y:98} },
+    { name:"NORTE → SUR OESTE", desc:"Vertical algo más a la izquierda.",
+      start:{x:40,y:2}, end:{x:40,y:98} },
+    { name:"NORTE → SUR ESTE", desc:"Vertical algo más a la derecha.",
+      start:{x:60,y:2}, end:{x:45,y:98} },
+
+    { name:"SUR → NORTE CENTRO", desc:"Vertical inversa casi centrada.",
+      start:{x:52,y:98}, end:{x:52,y:2} },
+    { name:"SUR → NORTE OESTE", desc:"Vertical inversa algo más a la izquierda.",
+      start:{x:42,y:98}, end:{x:47,y:2} },
+    { name:"SUR → NORTE ESTE", desc:"Vertical inversa algo más a la derecha.",
+      start:{x:62,y:98}, end:{x:55,y:2} }
+  ];
+
+  const cardsContainer = document.getElementById("cards");
+  const modalEl   = document.getElementById("modal");
+  const modalTitle= document.getElementById("modal-title");
+  const modalDesc = document.getElementById("modal-desc");
+  const modalMap  = document.getElementById("modal-map");
+  const modalLine = document.getElementById("modal-line");
+  const modalStart= document.getElementById("modal-start");
+  const modalEnd  = document.getElementById("modal-end");
+  const modalDrop = document.getElementById("modal-drop");
+  const modalJump = document.getElementById("modal-jump");
+  const modalClose= document.getElementById("modal-close");
+
+  function styleBusLine(lineEl){
+    lineEl.style.borderTop = "4px dashed rgba(96,165,250,1)";
+    lineEl.style.boxShadow = "0 0 6px rgba(15,23,42,0.9)";
+  }
+
+  function computeJumpOnBus(rect, preset){
+    const sx = rect.width  * (preset.start.x/100);
+    const sy = rect.height * (preset.start.y/100);
+    const ex = rect.width  * (preset.end.x/100);
+    const ey = rect.height * (preset.end.y/100);
+
+    const dx = ex - sx;
+    const dy = ey - sy;
+    const len = Math.hypot(dx,dy) || 1;
+
+    const dropX = rect.width  * (dropPos.x/100);
+    const dropY = rect.height * (dropPos.y/100);
+
+    const tProj = ((dropX-sx)*dx + (dropY-sy)*dy)/(len*len);
+    const tClamped = Math.max(0,Math.min(1,tProj));
+
+    const jumpOffsetPx = 220;
+    const backT = jumpOffsetPx/len;
+    const tJump = Math.max(0,tClamped - backT);
+    const jx = sx + dx*tJump;
+    const jy = sy + dy*tJump;
+
+    return {
+      jumpXperc: jx/rect.width*100,
+      jumpYperc: jy/rect.height*100,
+      percentAlong: (tJump*100).toFixed(0)
+    };
+  }
+
+  function drawBusAndPins(wrap, line, startPin, endPin, dropPin, jumpPin, preset){
+    const rect = wrap.getBoundingClientRect();
+    const sx = rect.width * (preset.start.x/100);
+    const sy = rect.height* (preset.start.y/100);
+    const ex = rect.width * (preset.end.x/100);
+    const ey = rect.height* (preset.end.y/100);
+    const dx = ex-sx, dy = ey-sy;
+    const len = Math.hypot(dx,dy);
+    const ang = Math.atan2(dy,dx)*180/Math.PI;
+
+    line.style.left = sx+"px";
+    line.style.top  = sy+"px";
+    line.style.width= len+"px";
+    line.style.transform = `rotate(${ang}deg)`;
+    styleBusLine(line);
+
+    startPin.style.left = preset.start.x+"%";
+    startPin.style.top  = preset.start.y+"%";
+    endPin.style.left   = preset.end.x+"%";
+    endPin.style.top    = preset.end.y+"%";
+
+    dropPin.style.left  = dropPos.x+"%";
+    dropPin.style.top   = dropPos.y+"%";
+
+    const jump = computeJumpOnBus(rect,preset);
+    jumpPin.style.left = jump.jumpXperc + "%";
+    jumpPin.style.top  = jump.jumpYperc + "%";
+
+    return jump.percentAlong;
+  }
+
+  function createCard(preset){
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.textContent = preset.name;
+    card.appendChild(title);
+
+    const wrap = document.createElement("div");
+    wrap.className = "map-wrap";
+    const img = document.createElement("img");
+    img.src = "mapa-fortnite.jpg";
+    img.alt = "Mapa Fortnite";
+    img.className = "map-img";
+    wrap.appendChild(img);
+
+    const line = document.createElement("div");
+    line.className = "line";
+    wrap.appendChild(line);
+
+    const pinStart = document.createElement("div");
+    pinStart.className = "pin start";
+    pinStart.innerHTML = '<span class="label">Inicio</span>';
+    wrap.appendChild(pinStart);
+
+    const pinEnd = document.createElement("div");
+    pinEnd.className = "pin end";
+    pinEnd.innerHTML = '<span class="label">Fin</span>';
+    wrap.appendChild(pinEnd);
+
+    const pinDrop = document.createElement("div");
+    pinDrop.className = "pin drop";
+    pinDrop.innerHTML = '<span class="label">Drop</span>';
+    wrap.appendChild(pinDrop);
+
+    const pinJump = document.createElement("div");
+    pinJump.className = "pin jump";
+    pinJump.innerHTML = '<span class="label">Salto aprox.</span>';
+    wrap.appendChild(pinJump);
+
+    let percentAlongText = "";
+
+    img.addEventListener("load",()=>{
+      percentAlongText = drawBusAndPins(
+        wrap,line,pinStart,pinEnd,pinDrop,pinJump,preset
+      );
+    });
+
+    const p = document.createElement("p");
+    p.textContent = preset.desc +
+      " Copia la marca amarilla al mapa cuando el bus sea parecido.";
+    card.appendChild(wrap);
+    card.appendChild(p);
+
+    card.addEventListener("click",()=>{
+      modalTitle.textContent = preset.name;
+      modalDesc.textContent  =
+        preset.desc +
+        " Marca amarilla aprox. al " +
+        percentAlongText +
+        "% del recorrido del bus desde el inicio.";
+      modalEl.style.display = "flex";
+      setTimeout(()=>{
+        drawBusAndPins(
+          modalMap,modalLine,modalStart,modalEnd,modalDrop,modalJump,preset
+        );
+      },10);
+    });
+
+    return card;
+  }
+
+  presets.forEach(p=>{
+    cardsContainer.appendChild(createCard(p));
+  });
+
+  modalClose.addEventListener("click",()=>modalEl.style.display="none");
+  modalEl.addEventListener("click",e=>{
+    if(e.target === modalEl) modalEl.style.display="none";
+  });
+</script>
+</body>
+</html>
